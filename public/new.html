@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New request — TC Queue</title>
+  <link rel="stylesheet" href="shell.css">
+  <link rel="stylesheet" href="composer.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <aside class="app-rail" aria-label="Navigation"></aside>
+
+  <div class="app-main">
+    <header class="page-head">
+      <div class="page-head-main">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Queue</a><span aria-hidden="true">›</span><span aria-current="page">New</span>
+        </nav>
+        <h1 class="page-title">New request</h1>
+      </div>
+    </header>
+
+    <form class="composer" id="request-form" autocomplete="off" novalidate>
+      <input type="hidden" name="type" id="form-type" value="create">
+
+      <div class="alert" data-tone="error" id="form-error" role="alert" hidden></div>
+
+      <fieldset class="modes">
+        <legend class="field-head">What should Claude do?</legend>
+        <div class="mode-grid">
+          <label class="mode">
+            <input type="radio" name="mode" value="create" checked>
+            <span class="mode-name">Create test cases</span>
+            <span class="mode-note">From a Jira epic, story, Confluence page or notes</span>
+            <span class="mode-icon" data-tone="create" aria-hidden="true"></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="analyze">
+            <span class="mode-name">Analyze a CSV</span>
+            <span class="mode-note">Check an existing test-case CSV against its requirements</span>
+            <span class="mode-icon" data-tone="analyze" aria-hidden="true"></span>
+          </label>
+          <label class="mode">
+            <input type="radio" name="mode" value="knowledge">
+            <span class="mode-name">Capture knowledge</span>
+            <span class="mode-note">Distil sources into the vault, no test cases</span>
+            <span class="mode-icon" data-tone="knowledge" aria-hidden="true"></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field-head" for="form-label">Label</label>
+        <p class="field-note" id="note-label">Optional. How you'll recognise this row in the queue.</p>
+        <input class="input" type="text" id="form-label" name="label" placeholder="PLAT-53933 login flow"
+          aria-describedby="note-label">
+      </div>
+
+      <div class="field" id="field-description">
+        <label class="field-head" for="form-description" id="label-description">Jira link or description</label>
+        <textarea class="textarea" id="form-description" name="description" rows="6"
+          aria-describedby="error-description"
+          placeholder="Paste a Jira Epic/Story/Confluence link, or write the requirements directly here"></textarea>
+        <p class="field-error" id="error-description" hidden></p>
+      </div>
+
+      <div class="field" id="field-attachments" hidden>
+        <label class="check" for="toggle-attachments">
+          <input type="checkbox" id="toggle-attachments">
+          <span>Attach reference files <em>— read alongside the description</em></span>
+        </label>
+        <div class="upload-block" id="attachments-upload" hidden>
+          <div class="drop" id="attachments-area">
+            <input type="file" id="form-attachments" multiple aria-label="Reference files"
+              aria-describedby="attachments-formats error-attachments"
+              accept=".pdf,.csv,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp,.bmp">
+            <div class="drop-inner">
+              <svg class="drop-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                   stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 11V3"/><path d="M4.75 6.25 8 3l3.25 3.25"/><path d="M2.5 12.5h11"/>
+              </svg>
+              <span>Drop files, or <strong>browse</strong></span>
+              <span class="drop-formats" id="attachments-formats">PDF, CSV, Excel, Word, JPG, PNG, GIF, WebP</span>
+            </div>
+          </div>
+          <ul class="file-list" id="attachments-list"></ul>
+        </div>
+        <p class="field-error" id="error-attachments" hidden></p>
+      </div>
+
+      <div class="field" id="field-csv" hidden>
+        <label class="field-head" for="form-csv">Test cases CSV</label>
+        <div class="drop" id="upload-area">
+          <input type="file" id="form-csv" accept=".csv,text/csv" aria-describedby="error-csv">
+          <div class="drop-inner">
+            <svg class="drop-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 11V3"/><path d="M4.75 6.25 8 3l3.25 3.25"/><path d="M2.5 12.5h11"/>
+            </svg>
+            <span id="csv-upload-hint">Drop a CSV, or <strong>browse</strong></span>
+          </div>
+        </div>
+        <ul class="file-list" id="csv-list" hidden></ul>
+        <p class="field-error" id="error-csv" hidden></p>
+      </div>
+
+      <div class="composer-foot">
+        <button type="submit" class="btn btn-primary" id="submit-btn"
+          aria-keyshortcuts="Meta+Enter Control+Enter">Add to queue</button>
+        <a class="btn btn-quiet" href="/">Cancel</a>
+        <p class="composer-hint">
+          <span id="composer-hint"></span>
+          <span class="composer-keys" aria-hidden="true"><span class="kbd" id="hint-mod">⌘</span> <span class="kbd">↵</span></span>
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <script type="module" src="new.js"></script>
+</body>
+</html>

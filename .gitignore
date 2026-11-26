@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Runtime queue state (request JSONs, uploaded attachments, result CSVs)
+queue/
+
+# Local secrets and per-person settings (schemas are in the *.example.json files)
+testrail.local.json
+google.local.json
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Tool / session state
+.playwright-mcp/
+.figma-tmp/
+
+# Obsidian per-machine state + plugin binaries. The shared config (app.json,
+# core-plugins.json, community-plugins.json) stays tracked so everyone is
+# prompted to install the same plugins.
+knowledge/.obsidian/workspace.json
+knowledge/.obsidian/workspace-mobile.json
+knowledge/.obsidian/appearance.json
+knowledge/.obsidian/hotkeys.json
+knowledge/.obsidian/plugins/
+knowledge/.obsidian/cache
+
+# OS noise
+.DS_Store

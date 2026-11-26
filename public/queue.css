@@ -1,0 +1,15 @@
+/* The Queue view. Head, toolbar, ledger and empty state are shared list chrome
+   (shell.css, ledger.css); only the "server unreachable" banner is the queue's
+   own, sitting between the toolbar and the ledger on the same gutters. */
+
+.q-offline {
+  max-width: calc(1440px - 2 * var(--sp-8));
+  margin: 0 var(--sp-8) var(--sp-3);
+}
+
+@media (max-width: 1119px) {
+  .q-offline {
+    margin-left: var(--sp-5);
+    margin-right: var(--sp-5);
+  }
+}

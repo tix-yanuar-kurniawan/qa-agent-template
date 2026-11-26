@@ -1,0 +1,820 @@
+/* Test cases: the index, the case editor (list and sheet), its drawer and the
+   TestRail sync dialog. Primitives — buttons, inputs, chips, popovers, drawer,
+   dialog, empty states — come from shell.css; this sheet only lays them out. */
+
+/* ---- Frame ----
+   The editor fills the viewport and scrolls inside its panel, so the header,
+   toolbar and Save stay in view. The index scrolls as a normal page. */
+
+.c-shell {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--rail-top));
+}
+
+.is-index .c-shell {
+  height: auto;
+}
+
+.c-alert {
+  margin: 0 var(--sp-8) var(--sp-3);
+}
+
+.c-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--sp-8) var(--sp-6);
+}
+
+/* ---- Header: one meta line, actions ---- */
+
+.c-meta-part {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.c-path {
+  max-width: 48ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-small);
+}
+
+.c-copy {
+  width: 22px;
+  height: 22px;
+}
+
+.c-copy svg {
+  width: 14px;
+  height: 14px;
+}
+
+.c-state {
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.c-state.dirty {
+  color: var(--amber);
+  font-weight: 500;
+}
+
+.c-state.failed {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* "In TestRail · 2h ago", beside the Sync button. Rendered by upload-dialog.js. */
+.c-tr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: var(--sp-2);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--green);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.c-tr-badge .dot {
+  background: currentColor;
+}
+
+.c-tr-badge.partial {
+  color: var(--amber);
+}
+
+.c-tr-badge[href]:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* ---- Toolbar ---- */
+
+.c-toolbar .search input {
+  width: 240px;
+}
+
+/* Search, field select and chips share one 32px row height. */
+.ct-group {
+  width: auto;
+  height: 32px;
+  min-height: 32px;
+  padding-block: 0;
+  font-size: var(--fs-small);
+}
+
+.ct-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.ct-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ct-filter[data-priority],
+.ct-filter[style] {
+  border-color: color-mix(in srgb, var(--tone) 45%, transparent);
+}
+
+.ct-filter:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.ct-filter[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--tone) 45%, transparent);
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+
+.ct-filter-n {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.ct-keys {
+  font-weight: 600;
+}
+
+.ct-keys-pop {
+  width: 300px;
+  padding: var(--sp-3);
+  font-size: var(--fs-small);
+}
+
+.ct-keys-head {
+  margin: var(--sp-2) 0 var(--sp-1);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ct-keys-head:first-child {
+  margin-top: 0;
+}
+
+.ct-keys-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-1) var(--sp-3);
+  align-items: center;
+  margin-bottom: var(--sp-2);
+}
+
+.ct-keys-list dt {
+  white-space: nowrap;
+}
+
+.ct-keys-note {
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ---- List view ---- */
+
+.c-list {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-width: 1376px;
+  overflow: auto;
+}
+
+.case-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto auto;
+  align-items: start;
+  column-gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.case-row:last-child {
+  border-bottom: 0;
+}
+
+.case-row:hover {
+  background: var(--row-hover);
+}
+
+.case-row:focus-visible {
+  outline-offset: -2px;
+}
+
+.case-row.is-selected {
+  background: var(--accent-bg);
+}
+
+.case-row > .chip,
+.case-row > .menu-wrap {
+  align-self: center;
+}
+
+/* Plain figures, centred, set like the title beside them. */
+.case-row .num {
+  align-self: center;
+  text-align: center;
+  color: var(--text);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.case-row-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.case-row-title {
+  font-weight: 500;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+}
+
+.case-row-meta {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.case-row-menu {
+  min-width: 140px;
+}
+
+/* ---- Sheet ---- */
+
+.c-grid-wrap {
+  position: relative;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.c-grid {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8125rem;
+  line-height: var(--lh-body);
+}
+
+.c-grid th,
+.c-grid td {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.c-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 32px;
+  padding: 0 var(--sp-2);
+  background: var(--head-bg);
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.c-lock {
+  width: 11px;
+  height: 11px;
+  margin-left: 4px;
+  vertical-align: -1px;
+}
+
+.c-grid thead .c-derived {
+  cursor: help;
+}
+
+.c-grid .c-corner {
+  left: 0;
+  z-index: 4;
+}
+
+.c-gutter {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  padding: 6px var(--sp-1);
+  background: var(--head-bg);
+  text-align: center !important;
+}
+
+.c-open {
+  min-width: 28px;
+  padding: 0 var(--sp-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.c-open:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.c-cell {
+  position: relative;
+  padding: 6px var(--sp-2);
+  color: var(--text);
+  cursor: cell;
+}
+
+.c-row:hover .c-cell {
+  background: var(--row-hover);
+}
+
+.c-cell:focus {
+  outline: none;
+}
+
+.c-cell-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.c-cell[aria-selected="true"] {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.c-cell[aria-selected="true"] .c-cell-text {
+  display: block;
+}
+
+/* Derived for TestRail: muted, and the header says why. */
+.c-cell.c-readonly,
+.c-row:hover .c-cell.c-readonly {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.c-cell.c-readonly[aria-selected="true"] {
+  box-shadow: inset 0 0 0 2px var(--border-strong);
+}
+
+/* The editor floats over its cell instead of stretching the row. */
+.c-editor {
+  position: absolute;
+  z-index: 6;
+  min-height: 96px;
+  padding: 6px var(--sp-2);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: var(--lh-body);
+  resize: none;
+  box-shadow: var(--shadow-md);
+}
+
+.c-editor:focus {
+  outline: none;
+}
+
+.c-choice {
+  min-width: 160px;
+}
+
+.c-choice .menu-item[aria-selected="true"] {
+  background: var(--surface-2);
+}
+
+.c-empty {
+  max-width: 1376px;
+}
+
+/* ---- Drawer ---- */
+
+.cp-body {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-4);
+}
+
+.cp-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.cp-label .c-lock {
+  margin: 0;
+}
+
+.cp-derived {
+  font-weight: 400;
+}
+
+.cp-derived::before {
+  content: "· ";
+}
+
+.cp-textarea {
+  min-height: 0;
+}
+
+.cp-value {
+  padding: 7px 10px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Index ---- */
+
+.c-picker {
+  flex: 1;
+}
+
+/* ---- TestRail sync dialog ---- */
+
+/* Sized by content, not `flex: 1` (a 0 basis): inside an auto-height dialog
+   that collapses the form to a sliver. Same fix as .p0-body in share-p0.css. */
+.tr-form {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tr-body,
+.tr-stage {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.tr-body,
+.tr-fields,
+.tr-stage {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-4);
+}
+
+.tr-field {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.tr-label {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.tr-hint,
+.tr-note {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.tr-preview {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--head-bg);
+}
+
+.tr-preview:empty {
+  display: none;
+}
+
+.tr-path {
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.tr-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.tr-diff-error {
+  color: var(--red);
+}
+
+.tr-cases {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.tr-cases summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+.tr-cases summary:hover {
+  color: var(--text);
+}
+
+.tr-cases ul {
+  display: grid;
+  gap: 2px;
+  max-height: 160px;
+  margin-top: var(--sp-1);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.tr-cases li {
+  display: flex;
+  gap: var(--sp-2);
+  color: var(--text);
+}
+
+.tr-cases li > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.tr-cases-folder,
+.tr-cases-note {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.tr-cases-folder {
+  width: 72px;
+}
+
+.tr-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-small);
+  cursor: pointer;
+}
+
+.tr-check input {
+  flex: none;
+  margin-top: 1px;
+}
+
+.tr-problems {
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-6);
+  border: 1px solid color-mix(in srgb, var(--red) 45%, transparent);
+  border-radius: var(--radius);
+  background: var(--red-bg);
+  color: var(--red);
+  font-size: var(--fs-small);
+}
+
+.tr-foot {
+  justify-content: flex-end;
+}
+
+/* Progress: a linear bar over the per-folder step list. */
+
+.tr-stage-title {
+  font-size: var(--fs-lead);
+  font-weight: 600;
+}
+
+.tr-stage[data-state="done"] .tr-stage-title {
+  color: var(--green);
+}
+
+.tr-stage[data-state="error"] .tr-stage-title {
+  color: var(--red);
+}
+
+.tr-stage-path {
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.tr-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.tr-progress-track {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.tr-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.3s ease-out;
+}
+
+.tr-stage[data-state="done"] .tr-progress-fill {
+  background: var(--green);
+}
+
+.tr-stage[data-state="error"] .tr-progress-fill {
+  background: var(--red);
+}
+
+/* Before the first case lands there is nothing to measure: a short segment slides. */
+.tr-stage[data-state="preparing"] .tr-progress-fill {
+  width: 30% !important;
+  animation: tr-slide 1.2s ease-in-out infinite;
+}
+
+.tr-progress-value {
+  min-width: 4ch;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.tr-steps {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  list-style: none;
+}
+
+.tr-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 7px var(--sp-3);
+  color: var(--text-muted);
+}
+
+.tr-step + .tr-step {
+  border-top: 1px solid var(--border);
+}
+
+.tr-step[data-state="active"],
+.tr-step[data-state="done"],
+.tr-step[data-state="failed"] {
+  color: var(--text);
+}
+
+.tr-step-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tr-step-meta {
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.tr-step[data-state="done"] .tr-step-meta {
+  color: var(--green);
+}
+
+.tr-step-dot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  color: transparent;
+}
+
+.tr-step-dot svg {
+  width: 12px;
+  height: 12px;
+}
+
+.tr-step[data-state="active"] .tr-step-dot {
+  border-top-color: var(--accent);
+  animation: tr-spin 0.8s linear infinite;
+}
+
+.tr-step[data-state="done"] .tr-step-dot {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--on-accent);
+}
+
+.tr-step[data-state="failed"] .tr-step-dot {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+
+.tr-stage-note {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.tr-stage[data-state="error"] .tr-stage-note {
+  color: var(--red);
+}
+
+@keyframes tr-slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(340%); }
+}
+
+@keyframes tr-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Responsive: the same gutters as the shared page head ---- */
+
+@media (max-width: 1119px) {
+  .c-body {
+    padding-left: var(--sp-5);
+    padding-right: var(--sp-5);
+  }
+
+  .c-alert {
+    margin-left: var(--sp-5);
+    margin-right: var(--sp-5);
+  }
+}
+
+@media (max-width: 860px) {
+  .c-toolbar .search {
+    flex: 1 1 100%;
+  }
+
+  .c-toolbar .search input {
+    width: 100%;
+  }
+}
+
+/* On a phone the page scrolls as a whole; the sheet keeps its own scroller. */
+@media (max-width: 719px) {
+  .c-shell {
+    height: auto;
+  }
+
+  .c-grid-wrap {
+    max-height: 70vh;
+  }
+
+  .case-row {
+    column-gap: var(--sp-3);
+  }
+}

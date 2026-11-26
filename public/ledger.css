@@ -1,0 +1,409 @@
+/* The ledger: one ruled table shared by Queue, Cases and Runs, sitting in a
+   white panel on the grey ground. Horizontal padding belongs to whatever
+   mounts it (shell.css gives .surface-list its gutters), not to the table. */
+
+.ledger-wrap {
+  max-width: 1440px;
+}
+
+/* The panel's rounding normally comes from clipping, but a row's ⋯ menu has
+   to hang past the last row. So the panel lets overflow out and the corner
+   cells carry the radius themselves. */
+.ledger-panel {
+  overflow: visible;
+}
+
+.ledger {
+  --cell-pad: var(--sp-3);
+  --corner: calc(var(--radius-lg) - 1px);
+
+  width: 100%;
+  /* Separate, not collapse: collapsed borders are shared and get distributed
+     with sub-pixel rounding, so rows land on 40 or 40.5. It also avoids the
+     collapsed-border bug that drops the rule under a sticky header. */
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* ---- Head ---- */
+
+.ledger thead th {
+  position: sticky;
+  top: var(--rail-top);
+  z-index: 2;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg);
+  text-align: left;
+  font-weight: 500;
+}
+
+.ledger thead th:first-child { border-top-left-radius: var(--corner); }
+.ledger thead th:last-child  { border-top-right-radius: var(--corner); }
+
+/* Sortable and static headers share one voice; only the cursor differs. */
+.col-sort,
+.col-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--cell-pad);
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.col-sort {
+  cursor: pointer;
+}
+
+.col-sort:hover,
+.col-sort[data-active="true"] {
+  color: var(--text);
+}
+
+.col-sort:focus-visible {
+  outline-offset: -2px;
+}
+
+.col-art .col-head {
+  justify-content: flex-end;
+}
+
+/* The sort mark is drawn, not a glyph. */
+.col-sort[data-active="true"]::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid currentColor;
+}
+
+th[aria-sort="ascending"] .col-sort::after {
+  transform: rotate(180deg);
+}
+
+/* ---- Column geometry ---- */
+
+.col-status  { width: 116px; }
+.col-type    { width: 148px; }
+.col-id      { width: 96px; }
+.col-date    { width: 100px; }
+.col-art     { width: 200px; }
+
+/* ---- Body ---- */
+
+.ledger tbody td {
+  height: var(--row-h);
+  padding: 0 var(--cell-pad);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* The panel's border closes the table; the last row needs no rule of its own. */
+.ledger tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.ledger tbody tr:last-child > :first-child { border-bottom-left-radius: var(--corner); }
+.ledger tbody tr:last-child > :last-child  { border-bottom-right-radius: var(--corner); }
+
+/* Uniform height, and rows never reflow: a status change swaps in place.
+   The height sits on the cells so the 1px rule is counted inside it. */
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--row-hover);
+}
+
+/* The accent bar marks the row under the pointer, and stays on an open row
+   down through its detail. */
+.row:hover td:first-child,
+.row[aria-expanded="true"] td:first-child,
+.row-detail td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.row[aria-expanded="true"] td {
+  border-bottom-color: transparent;
+  background: var(--surface-2);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* The row the composer just handed back. */
+.row.row-new td {
+  background: var(--accent-bg);
+}
+
+/* The name and its meta share a baseline, but the pair has to sit on the row's
+   centre line like every other cell's content. So the flex box is this inner
+   line, not the cell: a flex cell is no longer subject to
+   `vertical-align: middle`. */
+.label-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.row-label {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-weight: 500;
+}
+
+a.row-label {
+  text-decoration: none;
+}
+
+a.row-label:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* Weight differences live inside the row's cells, never in its height. */
+.row-meta {
+  flex: none;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+/* The ID is something to type after /run-it, so it reads as code. Clicking it
+   copies it; the confirmation takes its place for a moment. */
+.row-id {
+  margin-left: -6px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  cursor: copy;
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+}
+
+.row-id:hover,
+.row-id:focus-visible {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.row-id[data-copied] {
+  background: var(--green-bg);
+  color: var(--green);
+  font-family: var(--font);
+  font-weight: 600;
+}
+
+.col-date time {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+/* ---- Artifacts ---- */
+
+/* Visible overflow so the ⋯ menu can leave the cell. */
+.ledger tbody td.col-art {
+  overflow: visible;
+  text-align: right;
+}
+
+.art-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-1);
+}
+
+/* Phones get the short label; the long one is the accessible name either way. */
+.art-short {
+  display: none;
+}
+
+.art-none {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+/* ---- Month dividers: only under the date sort ---- */
+
+.month-row th {
+  height: 30px;
+  padding: 0 var(--cell-pad);
+  border-bottom: 1px solid var(--border);
+  background: var(--head-bg);
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.month-row .month-count {
+  margin-left: var(--sp-2);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Expanded detail ----
+   The detail hangs off the request name: a gutter cell spans the columns
+   before the label, so the text starts on the label's line at every width. */
+
+.ledger .row-detail td {
+  height: auto;
+  padding: var(--sp-1) var(--cell-pad) var(--sp-4);
+  background: var(--surface-2);
+  white-space: normal;
+  vertical-align: top;
+}
+
+.ledger .row-detail .detail-gutter {
+  padding: 0;
+}
+
+.detail-body {
+  max-width: 74ch;
+  margin-bottom: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.detail-actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+/* ---- Narrow ---- */
+
+@media (max-width: 860px) {
+  .col-status { width: 108px; }
+  .col-art    { width: 160px; }
+
+  /* Not display:none — a hidden th stays in a fixed table's column structure as
+     an auto column and takes half the leftover width from the label. */
+  .ledger .col-date,
+  .ledger .col-id {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ledger .col-date > *,
+  .ledger .col-id > * {
+    display: none;
+  }
+
+  /* Meta drops below the label only here, where the row has to give up columns.
+     The stack needs no vertical centring of its own — the table cell does it. */
+  .label-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    line-height: var(--lh-tight);
+  }
+
+  .row-label,
+  .row-meta {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* A phone cannot hold five columns. The label is the column that has to stay
+   readable, so status becomes its dot and type its short code. The words stay
+   in the DOM for screen readers. */
+@media (max-width: 560px) {
+  .ledger { --cell-pad: var(--sp-2); }
+
+  .col-status  { width: 28px; }
+  .col-type    { width: 52px; }
+  .col-art     { width: 108px; }
+
+  .ledger .col-status .col-head-text,
+  .ledger .col-type .col-sort-text,
+  .ledger .chip-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .ledger .col-status .status {
+    gap: 0;
+    font-size: 0;
+  }
+
+  .ledger .chip {
+    padding: 0 5px;
+  }
+
+  .ledger .chip svg {
+    display: none;
+  }
+
+  .ledger .chip[data-short]::before {
+    content: attr(data-short);
+  }
+
+  .art-long  { display: none; }
+  .art-short { display: inline; }
+}
+
+/* ---- Selection (Share P0) ----
+   The check column sits inside the same left gutter as the first text column,
+   and the header box lines up with the row boxes under it. */
+
+.ledger th.col-select,
+.ledger td.col-select {
+  width: calc(var(--cell-pad) + 15px + var(--sp-2));
+  padding: 0 0 0 var(--cell-pad);
+  text-align: left;
+}
+
+.ledger th.col-select {
+  vertical-align: middle;
+}
+
+.col-select input[type="checkbox"] {
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.col-select input[type="checkbox"]:disabled {
+  cursor: default;
+}

@@ -1,0 +1,121 @@
+/* Share P0: the selection bar over a list, and the dialog it opens. */
+
+.p0-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--accent-bg);
+}
+
+.p0-bar[hidden] {
+  display: none;
+}
+
+.p0-bar-count {
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Sized by its content, not the shared .dialog-body's `flex: 1` (a 0 basis),
+   which some browsers never grow inside an auto-height dialog — leaving just
+   the first line visible. It still scrolls once the dialog hits its max height. */
+.p0-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--sp-3);
+}
+
+.p0-note,
+.p0-detail {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.p0-detail {
+  margin-top: var(--sp-1);
+  overflow-wrap: anywhere;
+}
+
+.p0-title-line {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.p0-label {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.p0-sources {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--head-bg);
+}
+
+.p0-sources li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  font-size: var(--fs-body);
+}
+
+.p0-src {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.p0-count {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.p0-cmd {
+  margin: 0;
+  padding: var(--sp-3);
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.p0-link .input {
+  width: 100%;
+}
+
+.p0-foot-group {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.p0-overlap {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+a.p0-count {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a.p0-count:hover {
+  text-decoration: underline;
+}

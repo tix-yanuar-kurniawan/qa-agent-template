@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test cases — TC Queue</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shell.css">
+  <link rel="stylesheet" href="ledger.css">
+  <link rel="stylesheet" href="share-p0.css">
+  <link rel="stylesheet" href="cases.css">
+</head>
+<body class="cases-page">
+  <aside class="app-rail" aria-label="Navigation"></aside>
+
+  <div class="app-main">
+  <div class="c-shell">
+    <header class="page-head c-head">
+      <div class="page-head-main">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/cases">Test cases</a>
+          <span aria-hidden="true">›</span>
+          <span id="c-crumb-current">…</span>
+        </nav>
+        <h1 class="page-title" id="c-title">Test cases</h1>
+        <p class="page-meta" id="c-meta">
+          <span class="tnum" id="c-sub">Loading&#8230;</span>
+          <span class="c-meta-part" id="c-stats" hidden></span>
+          <span class="c-meta-part" id="c-source" hidden>
+            <span class="sep" aria-hidden="true"></span>
+            <span class="mono c-path" id="c-path"></span>
+            <button class="icon-btn c-copy" id="c-copy" type="button" aria-label="Copy source path" title="Copy source path">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 00-1-1h-6a1 1 0 00-1 1v6a1 1 0 001 1h2"/>
+              </svg>
+            </button>
+          </span>
+        </p>
+      </div>
+      <div class="page-actions">
+        <span class="c-state" id="c-state" aria-live="polite"></span>
+        <button class="btn" id="c-download" type="button" title="Download the TestRail CSV" hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M2.5 10.5v2a1 1 0 001 1h9a1 1 0 001-1v-2M8 2.5v7M5.5 7l2.5 2.5 2.5-2.5"/>
+          </svg>
+          <span>Download CSV</span>
+        </button>
+        <button class="btn" id="c-upload" type="button" title="Preview and sync these cases to TestRail" hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M2.5 10.5v2a1 1 0 001 1h9a1 1 0 001-1v-2M8 9.5v-7M5.5 5L8 2.5 10.5 5"/>
+          </svg>
+          <span>Sync to TestRail</span>
+        </button>
+        <button class="btn" id="c-share" type="button" title="Create a Google Sheet of this sheet's P0 cases for devs" hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="4" cy="8" r="1.75"/><circle cx="12" cy="4" r="1.75"/><circle cx="12" cy="12" r="1.75"/><path d="M5.6 7.2l4.8-2.4M5.6 8.8l4.8 2.4"/>
+          </svg>
+          <span>Share P0</span>
+        </button>
+        <a class="c-tr-badge" id="c-tr-badge" target="_blank" rel="noopener" hidden></a>
+        <button class="btn btn-primary" id="c-save" type="button" disabled>Save</button>
+      </div>
+    </header>
+
+    <div class="alert c-alert" id="c-alert" role="status" hidden></div>
+
+    <div class="toolbar c-toolbar" id="c-toolbar" hidden>
+      <div class="search">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <circle cx="7" cy="7" r="4.25"/><path d="M10.2 10.2 13.5 13.5"/>
+        </svg>
+        <input type="search" id="ct-q" placeholder="Search case titles" aria-label="Search case titles">
+      </div>
+      <select class="select ct-group" id="ct-group" aria-label="Filter chips by"></select>
+      <div class="ct-filters" id="ct-filters" role="group" aria-label="Filter by priority"></div>
+      <span class="toolbar-spacer"></span>
+      <p class="surface-tally" id="ct-tally" aria-live="polite"></p>
+      <div class="segmented" id="ct-toggle" role="group" aria-label="View"></div>
+      <button class="btn" id="ct-add" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M8 3.5v9M3.5 8h9"/></svg>
+        <span>Add case</span>
+      </button>
+      <div class="menu-wrap" id="ct-keys-wrap">
+        <button class="icon-btn ct-keys" id="ct-keys" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+        <div class="popover popover-right ct-keys-pop" id="ct-keys-pop" role="group" aria-label="Keyboard shortcuts" hidden>
+          <p class="ct-keys-head">List</p>
+          <dl class="ct-keys-list">
+            <dt><span class="kbd">↑</span> <span class="kbd">↓</span></dt><dd>Move between cases</dd>
+            <dt><span class="kbd">Enter</span></dt><dd>Open the case</dd>
+          </dl>
+          <p class="ct-keys-head">Sheet</p>
+          <dl class="ct-keys-list">
+            <dt><span class="kbd">←</span> <span class="kbd">→</span> <span class="kbd">↑</span> <span class="kbd">↓</span></dt><dd>Move between cells</dd>
+            <dt><span class="kbd">Tab</span></dt><dd>Next cell</dd>
+            <dt><span class="kbd">Enter</span> <span class="kbd">F2</span></dt><dd>Edit the cell</dd>
+            <dt><span class="kbd">Shift</span> <span class="kbd">Enter</span></dt><dd>New line while editing</dd>
+            <dt><span class="kbd">Esc</span></dt><dd>Cancel the edit</dd>
+            <dt><span class="kbd">Space</span></dt><dd>Open the case</dd>
+            <dt><span class="kbd">Delete</span></dt><dd>Clear the cell</dd>
+          </dl>
+          <dl class="ct-keys-list">
+            <dt><span class="kbd">&#8984;</span> <span class="kbd">S</span></dt><dd>Save</dd>
+          </dl>
+          <p class="ct-keys-note">
+            Title, Steps, Expected Result, Platform, Criticality, Case Type and Priority
+            save back to the source CSV. Locked columns are derived for TestRail.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-body" id="c-body" hidden>
+      <div class="panel c-list" id="c-list" role="list" aria-label="Test cases" hidden></div>
+
+      <div class="panel c-grid-wrap" id="c-grid-wrap" hidden>
+        <table class="c-grid" id="c-grid" role="grid" aria-label="Test cases">
+          <colgroup id="c-colgroup"></colgroup>
+          <thead id="c-thead"></thead>
+          <tbody id="c-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="panel empty c-empty" id="c-empty" hidden></div>
+    </div>
+
+    <!-- The index: every request with a sheet, when the page is opened without an id. -->
+    <div class="c-picker" id="c-picker" hidden></div>
+
+    <dialog class="drawer c-panel" id="c-panel" aria-labelledby="cp-num">
+      <header class="drawer-head">
+        <h2 class="drawer-title" id="cp-num"></h2>
+        <button class="icon-btn" id="cp-prev" type="button" aria-label="Previous case" title="Previous case">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 12.5v-9M4.5 7L8 3.5 11.5 7"/></svg>
+        </button>
+        <button class="icon-btn" id="cp-next" type="button" aria-label="Next case" title="Next case">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3.5v9M4.5 9L8 12.5 11.5 9"/></svg>
+        </button>
+        <button class="icon-btn" id="cp-close" type="button" aria-label="Close">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+        </button>
+      </header>
+      <div class="drawer-body cp-body" id="cp-body"></div>
+      <footer class="drawer-foot">
+        <button class="btn btn-danger" id="cp-delete" type="button">Delete case</button>
+        <button class="btn btn-primary" id="cp-done" type="button">Done</button>
+      </footer>
+    </dialog>
+
+    <dialog class="dialog tr-dialog" id="tr-dialog" aria-labelledby="tr-title">
+      <form class="tr-form" id="tr-form" method="dialog">
+        <header class="dialog-head" id="tr-head">
+          <h2 class="dialog-title" id="tr-title">Sync to TestRail</h2>
+          <button class="icon-btn" id="tr-close" type="button" aria-label="Close">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+              <path d="M4 4l8 8M12 4l-8 8"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="dialog-body tr-body" id="tr-body">
+          <p class="tr-note" id="tr-status" aria-live="polite">Loading&#8230;</p>
+
+          <div class="tr-fields" id="tr-fields" hidden>
+            <label class="tr-field">
+              <span class="tr-label">Suite</span>
+              <select class="select" id="tr-suite" required></select>
+            </label>
+
+            <label class="tr-field">
+              <span class="tr-label">Placement</span>
+              <select class="select" id="tr-placement">
+                <option value="standalone">Inside STANDALONE STORY</option>
+                <option value="new">New folder at suite level</option>
+              </select>
+            </label>
+
+            <label class="tr-field">
+              <span class="tr-label">Story folder</span>
+              <input class="input" type="text" id="tr-folder" required autocomplete="off">
+              <span class="tr-hint">An existing folder with this name is reused, not duplicated.</span>
+            </label>
+
+            <label class="tr-field" id="tr-fallback-field" hidden>
+              <span class="tr-label">Platform for cases without one</span>
+              <select class="select" id="tr-fallback"></select>
+            </label>
+
+            <label class="tr-field">
+              <span class="tr-label">References</span>
+              <input class="input" type="text" id="tr-refs" autocomplete="off" placeholder="PLAT-12345,PLAT-12000">
+            </label>
+
+            <div class="tr-preview" id="tr-preview" aria-live="polite"></div>
+          </div>
+
+          <ul class="tr-problems" id="tr-problems" role="alert" hidden></ul>
+        </div>
+
+        <div class="dialog-body tr-stage" id="tr-stage" data-state="preparing" hidden>
+          <div class="tr-stage-text" role="status" aria-live="polite">
+            <h3 class="tr-stage-title" id="tr-stage-title">Uploading to TestRail</h3>
+            <p class="tr-stage-path" id="tr-stage-path"></p>
+          </div>
+
+          <div class="tr-progress" id="tr-progress" role="progressbar" aria-label="Sync progress"
+               aria-valuemin="0" aria-valuemax="100">
+            <div class="tr-progress-track"><div class="tr-progress-fill" id="tr-progress-fill"></div></div>
+            <span class="tr-progress-value" id="tr-progress-value"></span>
+          </div>
+
+          <ol class="tr-steps" id="tr-steps"></ol>
+
+          <p class="tr-stage-note" id="tr-stage-note"></p>
+        </div>
+
+        <footer class="dialog-foot tr-foot" id="tr-stage-foot" hidden>
+          <button class="btn" id="tr-stage-back" type="button">Back</button>
+          <a class="btn" id="tr-stage-open" target="_blank" rel="noopener">
+            <span>Open in TestRail</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M6.5 3.5h-3v9h9v-3M9.5 3.5h3v3M12.5 3.5L7.5 8.5"/>
+            </svg>
+          </a>
+          <button class="btn btn-primary" id="tr-stage-done" type="button">Done</button>
+        </footer>
+
+        <footer class="dialog-foot tr-foot" id="tr-foot">
+          <button class="btn" id="tr-cancel" type="button">Cancel</button>
+          <button class="btn btn-primary" id="tr-submit" type="submit" disabled>Upload</button>
+        </footer>
+      </form>
+    </dialog>
+  </div>
+  </div>
+
+  <script type="module" src="cases.js"></script>
+</body>
+</html>

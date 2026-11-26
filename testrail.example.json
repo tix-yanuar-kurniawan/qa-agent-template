@@ -1,0 +1,8 @@
+{
+  "url": "https://tiket.testrail.com",
+  "username": "you@tiket.com",
+  "apiKey": "TestRail > My Settings > API Keys",
+  "projectId": 184,
+  "suites": [12196, 3023, 3025],
+  "pic": "Your Name"
+}
